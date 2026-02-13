@@ -1,0 +1,9 @@
+# Node / build outputs
+node_modules/
+dist/
+
+# Local env
+.env
+
+# MacOS
+.DS_Store
