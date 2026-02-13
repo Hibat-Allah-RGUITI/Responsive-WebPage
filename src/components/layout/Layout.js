@@ -2,7 +2,11 @@ import Header from './Header.js'
 import Footer from './Footer.js'
 import Careers from '../../pages/Careers.js'
 
-export default function Layout({ children }) {
+// Initialize layout on existing HTML structure instead of generating it entirely with JS
+export default function initLayout() {
+    const app = document.getElementById('app')
+    if (!app) return
+
     let darkMode = false
     try {
         const saved = localStorage.getItem('darkMode')
@@ -19,39 +23,34 @@ export default function Layout({ children }) {
         if (darkMode) document.documentElement.classList.add('dark')
         else document.documentElement.classList.remove('dark')
 
-        const headerEl = document.querySelector('header')
-        if (headerEl && headerEl.parentNode) {
-            const parent = headerEl.parentNode
-            parent.removeChild(headerEl)
-            parent.insertBefore(Header({ darkMode, setDarkMode }), parent.firstChild)
-        }
-
-        const mainEl = wrapper.querySelector('main')
-        if (mainEl) {
-            mainEl.innerHTML = ''
-            const newChildren = Careers({ darkMode })
-            mainEl.appendChild(newChildren)
-        }
-
-        const footerEl = document.querySelector('footer')
-        if (footerEl && footerEl.parentNode) {
-            const parent = footerEl.parentNode
-            parent.removeChild(footerEl)
-            parent.appendChild(Footer({ darkMode }))
-        }
+        renderHeader()
+        renderMain()
+        renderFooter()
     }
 
-    const wrapper = document.createElement('div')
-    wrapper.className = 'min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300'
-    const header = Header({ darkMode, setDarkMode })
-    wrapper.appendChild(header)
+    function renderHeader() {
+        const currentHeader = app.querySelector('header')
+        if (!currentHeader || !currentHeader.parentNode) return
+        const newHeader = Header({ darkMode, setDarkMode })
+        currentHeader.parentNode.replaceChild(newHeader, currentHeader)
+    }
 
-    const main = document.createElement('main')
-    main.appendChild(children)
-    wrapper.appendChild(main)
+    function renderMain() {
+        const main = app.querySelector('main')
+        if (!main) return
+        main.innerHTML = ''
+        const careers = Careers({ darkMode })
+        main.appendChild(careers)
+    }
 
-    const footer = Footer({ darkMode })
-    wrapper.appendChild(footer)
+    function renderFooter() {
+        const currentFooter = app.querySelector('footer')
+        if (!currentFooter || !currentFooter.parentNode) return
+        const newFooter = Footer({ darkMode })
+        currentFooter.parentNode.replaceChild(newFooter, currentFooter)
+    }
 
-    return wrapper
+    renderHeader()
+    renderMain()
+    renderFooter()
 }
