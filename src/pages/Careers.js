@@ -675,28 +675,32 @@ class ContactForm {
     createElement() {
         try {
             this.element = document.createElement('form')
-            this.element.className = 'max-w-lg mx-auto flex flex-col gap-4'
+            this.element.noValidate = true
+            this.element.className = 'max-w-lg mx-auto flex flex-col gap-1'
 
             // Fields
             this.emailInput = this.createInput(CONFIG.form.fields.email)
+            this.emailError = this.createErrorDiv()
             this.nameInput = this.createInput(CONFIG.form.fields.name)
+            this.nameError = this.createErrorDiv()
             this.phoneInput = this.createInput(CONFIG.form.fields.phone)
+            this.phoneError = this.createErrorDiv()
             this.messageInput = this.createTextarea(CONFIG.form.fields.message)
+            this.messageError = this.createErrorDiv()
 
             // Submit button
             this.submitButton = this.createSubmitButton()
 
-            // Errors container
-            this.errorsContainer = document.createElement('div')
-            this.errorsContainer.className = 'mt-4 text-red-600'
-
-            // Append all
+            // Append all with their error divs
             this.element.appendChild(this.emailInput)
+            this.element.appendChild(this.emailError)
             this.element.appendChild(this.nameInput)
+            this.element.appendChild(this.nameError)
             this.element.appendChild(this.phoneInput)
+            this.element.appendChild(this.phoneError)
             this.element.appendChild(this.messageInput)
+            this.element.appendChild(this.messageError)
             this.element.appendChild(this.submitButton)
-            this.element.appendChild(this.errorsContainer)
 
             // Event listener
             this.element.addEventListener('submit', (e) => this.handleSubmit(e))
@@ -710,7 +714,6 @@ class ContactForm {
         input.name = name
         input.type = type
         input.placeholder = placeholder
-        input.required = true
         input.className = 'px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white'
         input.style.setProperty('--tw-ring-color', '#1C238D')
         return input
@@ -721,10 +724,15 @@ class ContactForm {
         textarea.name = name
         textarea.placeholder = placeholder
         textarea.rows = rows
-        textarea.required = true
         textarea.className = 'px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 resize-none bg-white dark:bg-gray-700 text-black dark:text-white'
         textarea.style.setProperty('--tw-ring-color', '#1C238D')
         return textarea
+    }
+
+    createErrorDiv() {
+        const div = document.createElement('div')
+        div.className = 'text-red-600 text-sm mt-1 min-h-[1rem]'
+        return div
     }
 
     createSubmitButton() {
@@ -754,49 +762,60 @@ class ContactForm {
 
             const errors = this.validate(email, name, phone, message)
 
-            this.errorsContainer.innerHTML = ''
+            // Clear all error divs
+            this.emailError.textContent = ''
+            this.nameError.textContent = ''
+            this.phoneError.textContent = ''
+            this.messageError.textContent = ''
 
-            if (errors.length) {
-                errors.forEach(errorText => {
-                    const p = document.createElement('p')
-                    p.textContent = errorText
-                    this.errorsContainer.appendChild(p)
-                })
-            } else {
-                alert('Form is valid!') // you can replace with real submission
+            // Display errors beside each field
+            if (errors.email) this.emailError.textContent = errors.email
+            if (errors.name) this.nameError.textContent = errors.name
+            if (errors.phone) this.phoneError.textContent = errors.phone
+            if (errors.message) this.messageError.textContent = errors.message
+
+            // If no errors, submit
+            if (Object.keys(errors).length === 0) {
+                alert('Form is valid!')
                 this.element.reset()
             }
         } catch (err) {
             console.error('Error submitting form:', err)
-            this.errorsContainer.innerHTML = '<p>An unexpected error occurred. Please try again.</p>'
+            alert('An unexpected error occurred. Please try again.')
         }
     }
 
     validate(email, name, phone, message) {
-        const errors = []
+        const errors = {}
 
-        // All fields are required
-        if (!email) errors.push('Email is required')
-        if (!name) errors.push('Name is required')
-        if (!phone) errors.push('Phone is required')
-        if (!message) errors.push('Message is required')
-
-        // Email format
-        if (email && !email.includes('@')) {
-            errors.push('Invalid email address')
+        // Email regex
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!email) {
+            errors.email = 'Email is required'
+        } else if (!emailRegex.test(email)) {
+            errors.email = 'Invalid email address'
         }
 
-        // Name length
-        if (name && name.length < 2) {
-            errors.push('Name is too short')
+        // Name regex
+        const nameRegex = /^[A-Za-z\s]{2,}$/
+        if (!name) {
+            errors.name = 'Name is required'
+        } else if (!nameRegex.test(name)) {
+            errors.name = 'Invalid name (only letters, min 2 chars)'
         }
 
-        // Phone validation: digits only, 10-15 length
-        if (phone) {
-            const phoneDigits = phone.replace(/\D/g, '')
-            if (!/^\d{10,15}$/.test(phoneDigits)) {
-                errors.push('Invalid phone number')
-            }
+        // Phone regex
+        const phoneRegex = /^\d{10,15}$/
+        const phoneDigits = phone.replace(/\D/g, '')
+        if (!phone) {
+            errors.phone = 'Phone is required'
+        } else if (!phoneRegex.test(phoneDigits)) {
+            errors.phone = 'Invalid phone number'
+        }
+
+        // Message
+        if (!message) {
+            errors.message = 'Message is required'
         }
 
         return errors
