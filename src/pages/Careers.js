@@ -673,32 +673,36 @@ class ContactForm {
     }
 
     createElement() {
-        this.element = document.createElement('form')
-        this.element.className = 'max-w-lg mx-auto flex flex-col gap-4'
+        try {
+            this.element = document.createElement('form')
+            this.element.className = 'max-w-lg mx-auto flex flex-col gap-4'
 
-        // Fields
-        this.emailInput = this.createInput(CONFIG.form.fields.email)
-        this.nameInput = this.createInput(CONFIG.form.fields.name)
-        this.phoneInput = this.createInput(CONFIG.form.fields.phone)
-        this.messageInput = this.createTextarea(CONFIG.form.fields.message)
+            // Fields
+            this.emailInput = this.createInput(CONFIG.form.fields.email)
+            this.nameInput = this.createInput(CONFIG.form.fields.name)
+            this.phoneInput = this.createInput(CONFIG.form.fields.phone)
+            this.messageInput = this.createTextarea(CONFIG.form.fields.message)
 
-        // Submit button
-        this.submitButton = this.createSubmitButton()
+            // Submit button
+            this.submitButton = this.createSubmitButton()
 
-        // Errors container
-        this.errorsContainer = document.createElement('div')
-        this.errorsContainer.className = 'mt-4 text-red-600'
+            // Errors container
+            this.errorsContainer = document.createElement('div')
+            this.errorsContainer.className = 'mt-4 text-red-600'
 
-        // Append all
-        this.element.appendChild(this.emailInput)
-        this.element.appendChild(this.nameInput)
-        this.element.appendChild(this.phoneInput)
-        this.element.appendChild(this.messageInput)
-        this.element.appendChild(this.submitButton)
-        this.element.appendChild(this.errorsContainer)
+            // Append all
+            this.element.appendChild(this.emailInput)
+            this.element.appendChild(this.nameInput)
+            this.element.appendChild(this.phoneInput)
+            this.element.appendChild(this.messageInput)
+            this.element.appendChild(this.submitButton)
+            this.element.appendChild(this.errorsContainer)
 
-        // Event listener
-        this.element.addEventListener('submit', (e) => this.handleSubmit(e))
+            // Event listener
+            this.element.addEventListener('submit', (e) => this.handleSubmit(e))
+        } catch (err) {
+            console.error('Error creating form:', err)
+        }
     }
 
     createInput({ name, type, placeholder }) {
@@ -706,6 +710,7 @@ class ContactForm {
         input.name = name
         input.type = type
         input.placeholder = placeholder
+        input.required = true
         input.className = 'px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white'
         input.style.setProperty('--tw-ring-color', '#1C238D')
         return input
@@ -716,6 +721,7 @@ class ContactForm {
         textarea.name = name
         textarea.placeholder = placeholder
         textarea.rows = rows
+        textarea.required = true
         textarea.className = 'px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 resize-none bg-white dark:bg-gray-700 text-black dark:text-white'
         textarea.style.setProperty('--tw-ring-color', '#1C238D')
         return textarea
@@ -740,46 +746,63 @@ class ContactForm {
 
     handleSubmit(e) {
         e.preventDefault()
+        try {
+            const email = this.emailInput.value.trim()
+            const name = this.nameInput.value.trim()
+            const phone = this.phoneInput.value.trim()
+            const message = this.messageInput.value.trim()
 
-        const email = this.emailInput.value || ''
-        const name = this.nameInput.value || ''
-        const phone = this.phoneInput.value || ''
+            const errors = this.validate(email, name, phone, message)
 
-        const errors = this.validate(email, name, phone)
+            this.errorsContainer.innerHTML = ''
 
-        this.errorsContainer.innerHTML = ''
-
-        if (errors.length) {
-            errors.forEach(errorText => {
-                const p = document.createElement('p')
-                p.textContent = errorText
-                this.errorsContainer.appendChild(p)
-            })
-        } else {
-            alert('Formulaire valide')
-            this.element.reset()
+            if (errors.length) {
+                errors.forEach(errorText => {
+                    const p = document.createElement('p')
+                    p.textContent = errorText
+                    this.errorsContainer.appendChild(p)
+                })
+            } else {
+                alert('Form is valid!') // you can replace with real submission
+                this.element.reset()
+            }
+        } catch (err) {
+            console.error('Error submitting form:', err)
+            this.errorsContainer.innerHTML = '<p>An unexpected error occurred. Please try again.</p>'
         }
     }
 
-    validate(email, name, phone) {
+    validate(email, name, phone, message) {
         const errors = []
 
-        if (!email.includes('@')) {
-            errors.push('Email invalide')
+        // All fields are required
+        if (!email) errors.push('Email is required')
+        if (!name) errors.push('Name is required')
+        if (!phone) errors.push('Phone is required')
+        if (!message) errors.push('Message is required')
+
+        // Email format
+        if (email && !email.includes('@')) {
+            errors.push('Invalid email address')
         }
 
-        if (name.trim().length < 2 && name.trim().length !== 0) {
-            errors.push('Nom trop court')
+        // Name length
+        if (name && name.length < 2) {
+            errors.push('Name is too short')
         }
 
-        const phoneDigits = (phone || '').replace(/\D/g, '')
-        if (!/^\d{10,15}$/.test(phoneDigits)) {
-            errors.push('Téléphone invalide')
+        // Phone validation: digits only, 10-15 length
+        if (phone) {
+            const phoneDigits = phone.replace(/\D/g, '')
+            if (!/^\d{10,15}$/.test(phoneDigits)) {
+                errors.push('Invalid phone number')
+            }
         }
 
         return errors
     }
 }
+
 
 // ========== HELPER FUNCTIONS ==========
 function createPicture(srcPath, alt = '') {
