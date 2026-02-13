@@ -8,11 +8,11 @@ Supports **dark mode** and optimized for **performance and accessibility**.
 
 ## 🚀 Features
 
-- Fully **responsive** layout for mobile, tablet, and desktop.  
+- Fully **responsive** Web page.  
 - **Dark mode** toggle support.  
 - **Lazy loading** for images and optimized assets.  
 - **SVG icons** for lightweight and scalable visuals.  
-- **Slider/Carousel** component with keyboard and pointer navigation.  
+- **Slider** component with keyboard and pointer navigation.  
 - **Accordion sections** for collapsible content.  
 - **Statistics counters** animated on scroll.  
 - **Contact form**.  

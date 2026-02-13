@@ -128,250 +128,222 @@ export default function Careers({ darkMode } = {}) {
     template.innerHTML = tpl
     const container = template.content.firstElementChild.cloneNode(true)
 
-    // Render all sections
-    const heroSection = container.querySelector('.hero-section')
-    heroSection.replaceWith(createHeroSection(darkMode))
-
-    const featuresSection = container.querySelector('.features-section')
-    featuresSection.replaceWith(createFeaturesSection(darkMode))
-
-    const sliderSection = container.querySelector('.slider-section')
-    sliderSection.replaceWith(createSliderSection(darkMode))
-
-    const accordionsSection = container.querySelector('.accordions-section')
-    accordionsSection.replaceWith(createAccordionsSection(darkMode))
-
-    const statsSection = container.querySelector('.stats-section')
-    statsSection.replaceWith(createStatsSection(darkMode))
-
-    const formSection = container.querySelector('.form-section')
-    formSection.replaceWith(createFormSection(darkMode))
+    initHeroSection(container, darkMode)
+    initFeaturesSection(container, darkMode)
+    initSliderSection(container, darkMode)
+    initAccordionsSection(container, darkMode)
+    initStatsSection(container, darkMode)
+    initFormSection(container, darkMode)
 
     return container
 }
 
-// ========== HERO SECTION ==========
-function createHeroSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'text-white text-center py-10 px-4 sm:px-10 lg:px-40'
+// ========== NEW INITIALIZERS USING HTML TEMPLATE ==========
+
+function initHeroSection(container, darkMode) {
+    const section = container.querySelector('.hero-section')
+    if (!section) return
+
     section.style.backgroundColor = darkMode ? '#141B6B' : '#1C238D'
 
-    const title = document.createElement('h1')
-    title.className = 'text-4xl font-bold mb-6'
-    title.textContent = CONFIG.hero.title
+    const title = section.querySelector('.hero-title')
+    const description = section.querySelector('.hero-description')
 
-    const description = document.createElement('p')
-    description.className = 'text-lg mb-8'
-    description.style.fontFamily = '"Brandon Grotesque", sans-serif'
-    description.style.fontWeight = '390'
-    description.style.lineHeight = '1.8'
-    description.textContent = CONFIG.hero.description
+    if (title) {
+        title.textContent = CONFIG.hero.title
+    }
 
-    section.appendChild(title)
-    section.appendChild(description)
-
-    return section
+    if (description) {
+        description.textContent = CONFIG.hero.description
+        description.style.fontFamily = '"Brandon Grotesque", sans-serif'
+        description.style.fontWeight = '390'
+        description.style.lineHeight = '1.8'
+    }
 }
 
-// ========== FEATURES SECTION ==========
-function createFeaturesSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'py-16 px-4 bg-[#F6F3EE]'
-    if (darkMode) section.classList.add('dark:bg-gray-800')
+// ========== FEATURES INITIALIZER ==========
 
-    const lead = document.createElement('p')
-    lead.className = 'text-center text-black dark:text-white mb-2'
-    lead.style.fontFamily = '"Brandon Grotesque", sans-serif'
-    lead.style.fontSize = '14px'
-    lead.textContent = CONFIG.features.lead
+function initFeaturesSection(container, darkMode) {
+    const section = container.querySelector('.features-section')
+    if (!section) return
 
-    const title = document.createElement('h2')
-    title.className = 'text-center font-bold text-3xl mb-12'
-    title.style.color = darkMode ? '#3B6CB8' : '#1C238D'
-    title.textContent = CONFIG.features.title
+    const lead = section.querySelector('.features-lead')
+    const title = section.querySelector('.features-title')
+    const grid = section.querySelector('.features-grid')
+    const cardTemplate = section.querySelector('#feature-card-template')
 
-    const grid = document.createElement('div')
-    grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8'
+    if (lead) {
+        lead.style.fontFamily = '"Brandon Grotesque", sans-serif'
+        lead.style.fontSize = '14px'
+        lead.textContent = CONFIG.features.lead
+    }
 
-    CONFIG.features.items.forEach((item, idx) => {
-        const card = createFeatureCard(item, idx, darkMode)
-        grid.appendChild(card)
+    if (title) {
+        title.textContent = CONFIG.features.title
+        title.style.color = darkMode ? '#3B6CB8' : '#1C238D'
+    }
+
+    if (!grid || !cardTemplate) return
+
+    CONFIG.features.items.forEach((item, index) => {
+        const node = cardTemplate.content.firstElementChild.cloneNode(true)
+
+        const source = node.querySelector('.feature-picture-source')
+        const img = node.querySelector('.feature-image')
+        if (source) {
+            source.srcset = `${item.image} 1x`
+        }
+        if (img) {
+            img.src = item.image
+            img.alt = `Feature ${index + 1}`
+        }
+
+        const titleEl = node.querySelector('.feature-title')
+        const descEl = node.querySelector('.feature-description')
+        if (titleEl) {
+            titleEl.textContent = item.title
+            titleEl.style.color = darkMode ? '#3B6CB8' : '#1C238D'
+        }
+        if (descEl) {
+            descEl.textContent = item.description
+        }
+
+        grid.appendChild(node)
     })
-
-    section.appendChild(lead)
-    section.appendChild(title)
-    section.appendChild(grid)
-
-    return section
 }
 
-function createFeatureCard(item, index, darkMode) {
-    const card = document.createElement('a')
-    card.href = '#'
-    card.className = 'flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-gray-100 hover:scale-105 transition cursor-pointer'
+// ========== SLIDER INITIALIZER + CLASS ==========
 
-    const { picture, img } = createPicture(item.image, `Feature ${index + 1}`)
-    img.className = 'w-20 h-20 object-cover'
-    img.width = 80
-    img.height = 80
+function initSliderSection(container, darkMode) {
+    const section = container.querySelector('.slider-section')
+    if (!section) return
 
-    const title = document.createElement('h3')
-    title.className = 'font-bold'
-    title.style.color = darkMode ? '#3B6CB8' : '#1C238D'
-    title.textContent = item.title
+    const sliderWrap = section.querySelector('.slider-wrap')
+    const slider = new HtmlSlider(CONFIG.slides, darkMode, section)
 
-    const description = document.createElement('p')
-    description.className = 'text-sm text-gray-700 dark:text-gray-300'
-    description.textContent = item.description
-
-    card.appendChild(picture)
-    card.appendChild(title)
-    card.appendChild(description)
-
-    return card
+    if (sliderWrap) {
+        sliderWrap.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') slider.prev()
+            if (e.key === 'ArrowRight') slider.next()
+        })
+    }
 }
 
-// ========== SLIDER SECTION ==========
-function createSliderSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'py-16 px-4 bg-gray-50 dark:bg-gray-900 text-center'
-
-    const sliderWrap = document.createElement('div')
-    sliderWrap.className = 'max-w-4xl mx-auto relative flex items-center gap-4'
-    sliderWrap.tabIndex = 0
-    sliderWrap.setAttribute('role', 'region')
-    sliderWrap.setAttribute('aria-label', 'Carousel')
-
-    const slider = new Slider(CONFIG.slides, darkMode)
-
-    sliderWrap.appendChild(slider.prevButton)
-    sliderWrap.appendChild(slider.viewport)
-    sliderWrap.appendChild(slider.nextButton)
-
-    section.appendChild(sliderWrap)
-    section.appendChild(slider.indicators)
-
-    // Keyboard navigation
-    sliderWrap.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') slider.prev()
-        if (e.key === 'ArrowRight') slider.next()
-    })
-
-    return section
-}
-
-// Slider Class
-class Slider {
-    constructor(slides, darkMode) {
+class HtmlSlider {
+    constructor(slides, darkMode, section) {
         this.slides = slides
         this.darkMode = darkMode
+        this.section = section
         this.currentSlide = 0
         this.autoplayInterval = null
         this.AUTOPLAY_DELAY = 5000
 
-        this.createElements()
+        this.setupElements()
         this.attachEventListeners()
         this.startAutoplay()
     }
 
-    createElements() {
-        // Previous button
-        this.prevButton = this.createNavigationButton('prev', ChevronLeftIcon)
+    setupElements() {
+        this.prevButton = this.section.querySelector('.slider-prev')
+        this.nextButton = this.section.querySelector('.slider-next')
+        this.viewport = this.section.querySelector('.slider-viewport')
+        this.track = this.section.querySelector('.slider-track')
+        this.indicators = this.section.querySelector('.slider-indicators')
 
-        // Next button
-        this.nextButton = this.createNavigationButton('next', ChevronRightIcon)
+        if (this.viewport) {
+            this.viewport.style.backgroundColor = this.darkMode ? '#0f1724' : '#ffffff'
+        }
 
-        // Viewport and track
-        this.viewport = document.createElement('div')
-        this.viewport.className = 'flex-1 overflow-hidden rounded-xl'
-        this.viewport.style.backgroundColor = this.darkMode ? '#0f1724' : '#ffffff'
+        if (this.track) {
+            this.track.style.display = 'flex'
+            this.track.style.transition = 'transform 500ms ease'
+            this.track.style.willChange = 'transform'
+        }
 
-        this.track = document.createElement('div')
-        this.track.style.display = 'flex'
-        this.track.style.transition = 'transform 500ms ease'
-        this.track.style.willChange = 'transform'
+        const slideTemplate = this.section.querySelector('#slider-slide-template')
+        if (this.track && slideTemplate) {
+            this.slides.forEach((slide) => {
+                const node = slideTemplate.content.firstElementChild.cloneNode(true)
 
-        // Create slides
-        this.slides.forEach((slide) => {
-            const slideEl = this.createSlideElement(slide)
-            this.track.appendChild(slideEl)
-        })
+                // Ensure each slide takes full viewport width like before
+                node.style.minWidth = '100%'
+                node.style.width = '100%'
 
-        this.viewport.appendChild(this.track)
+                const titleEl = node.querySelector('.slider-slide-title')
+                if (titleEl) {
+                    titleEl.textContent = slide.title
+                    titleEl.style.color = this.darkMode ? '#3B6CB8' : '#1C238D'
+                }
 
-        // Indicators
-        this.indicators = document.createElement('div')
-        this.indicators.className = 'flex justify-center gap-3 mt-6'
+                const paraPrototype = node.querySelector('.slider-slide-paragraph')
+                if (paraPrototype && paraPrototype.parentNode) {
+                    const parent = paraPrototype.parentNode
+
+                    slide.paragraphs.forEach((text, index) => {
+                        const p = index === 0 ? paraPrototype : paraPrototype.cloneNode(true)
+                        p.textContent = text
+                        if (index > 0) parent.appendChild(p)
+                    })
+                }
+
+                this.track.appendChild(node)
+            })
+        }
+
         this.renderIndicators()
     }
 
-    createNavigationButton(type, iconSvg) {
-        const button = document.createElement('button')
-        button.className = 'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white transition hover:opacity-80'
-        button.style.backgroundColor = this.darkMode ? '#3B6CB8' : '#1C238D'
-        button.innerHTML = iconSvg
-        button.setAttribute('aria-label', type === 'prev' ? 'Previous slide' : 'Next slide')
-
-        const svg = button.querySelector('svg')
-        if (svg) {
-            svg.classList.add('w-6', 'h-6')
+    attachEventListeners() {
+        if (this.prevButton) {
+            this.prevButton.innerHTML = ChevronLeftIcon
+            this.prevButton.setAttribute('aria-label', 'Previous slide')
+            const svg = this.prevButton.querySelector('svg')
+            if (svg) {
+                svg.style.width = '1.5rem'
+                svg.style.height = '1.5rem'
+            }
+            this.prevButton.addEventListener('click', () => this.prev())
         }
 
-        return button
-    }
+        if (this.nextButton) {
+            this.nextButton.innerHTML = ChevronRightIcon
+            this.nextButton.setAttribute('aria-label', 'Next slide')
+            const svg = this.nextButton.querySelector('svg')
+            if (svg) {
+                svg.style.width = '1.5rem'
+                svg.style.height = '1.5rem'
+            }
+            this.nextButton.addEventListener('click', () => this.next())
+        }
 
-    createSlideElement(slide) {
-        const slideEl = document.createElement('div')
-        slideEl.style.minWidth = '100%'
-        slideEl.style.width = '100%'
-        slideEl.className = 'p-8'
+        if (this.viewport && this.track) {
+            this.viewport.addEventListener('mouseenter', () => this.stopAutoplay())
+            this.viewport.addEventListener('mouseleave', () => this.startAutoplay())
 
-        const title = document.createElement('h3')
-        title.className = 'text-2xl font-bold mb-4'
-        title.style.color = this.darkMode ? '#3B6CB8' : '#1C238D'
-        title.textContent = slide.title
-        slideEl.appendChild(title)
+            let pointerStartX = null
+            let pointerDown = false
 
-        slide.paragraphs.forEach((paragraphText) => {
-            const p = document.createElement('p')
-            p.className = 'text-gray-700 dark:text-gray-300 text-sm leading-6 mb-3'
-            p.textContent = paragraphText
-            slideEl.appendChild(p)
-        })
+            this.track.addEventListener('pointerdown', (e) => {
+                pointerStartX = e.clientX
+                pointerDown = true
+                this.track.setPointerCapture(e.pointerId)
+            })
 
-        return slideEl
-    }
-
-    attachEventListeners() {
-        this.prevButton.addEventListener('click', () => this.prev())
-        this.nextButton.addEventListener('click', () => this.next())
-
-        // Pause on hover
-        this.viewport.addEventListener('mouseenter', () => this.stopAutoplay())
-        this.viewport.addEventListener('mouseleave', () => this.startAutoplay())
-
-        // Touch/pointer support
-        let pointerStartX = null
-        let pointerDown = false
-
-        this.track.addEventListener('pointerdown', (e) => {
-            pointerStartX = e.clientX
-            pointerDown = true
-            this.track.setPointerCapture(e.pointerId)
-        })
-
-        this.track.addEventListener('pointerup', (e) => {
-            if (!pointerDown || pointerStartX === null) return
-            const diff = e.clientX - pointerStartX
-            if (diff > 50) this.prev()
-            else if (diff < -50) this.next()
-            pointerDown = false
-            pointerStartX = null
-        })
+            this.track.addEventListener('pointerup', (e) => {
+                if (!pointerDown || pointerStartX === null) return
+                const diff = e.clientX - pointerStartX
+                if (diff > 50) this.prev()
+                else if (diff < -50) this.next()
+                pointerDown = false
+                pointerStartX = null
+            })
+        }
     }
 
     updateTrack() {
-        this.track.style.transform = `translateX(-${this.currentSlide * 100}%)`
+        if (this.track) {
+            this.track.style.transform = `translateX(-${this.currentSlide * 100}%)`
+        }
         this.renderIndicators()
     }
 
@@ -388,10 +360,13 @@ class Slider {
     }
 
     renderIndicators() {
+        if (!this.indicators) return
         this.indicators.innerHTML = ''
         this.slides.forEach((_, i) => {
             const button = document.createElement('button')
-            button.className = 'w-3 h-3 rounded-full'
+            button.style.width = '0.75rem'
+            button.style.height = '0.75rem'
+            button.style.borderRadius = '9999px'
             button.style.backgroundColor = this.currentSlide === i
                 ? (this.darkMode ? '#3B6CB8' : '#1C238D')
                 : (this.darkMode ? '#4B5563' : '#D1D5DB')
@@ -424,27 +399,20 @@ class Slider {
     }
 }
 
-// ========== ACCORDIONS SECTION ==========
-function createAccordionsSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'py-16 px-4 bg-[#F6F3EE] dark:bg-gray-800'
+// ========== ACCORDIONS INITIALIZER + CLASS ==========
 
-    const wrapper = document.createElement('div')
-    wrapper.className = 'max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6'
+function initAccordionsSection(container, darkMode) {
+    const section = container.querySelector('.accordions-section')
+    if (!section) return
 
-    const accordion = new AccordionGroup(CONFIG.accordions, darkMode)
-    accordion.items.forEach(item => wrapper.appendChild(item.element))
-
-    section.appendChild(wrapper)
-
-    return section
+    new HtmlAccordionGroup(CONFIG.accordions, darkMode, section)
 }
 
-// Accordion Class
-class AccordionGroup {
-    constructor(accordions, darkMode) {
+class HtmlAccordionGroup {
+    constructor(accordions, darkMode, section) {
         this.accordions = accordions
         this.darkMode = darkMode
+        this.section = section
         this.items = []
         this.openIndex = null
 
@@ -452,75 +420,56 @@ class AccordionGroup {
     }
 
     createAccordions() {
+        const wrapper = this.section.querySelector('.accordions-wrapper')
+        const template = this.section.querySelector('#accordion-item-template')
+        if (!wrapper || !template) return
+
         this.accordions.forEach((acc, idx) => {
-            const item = this.createAccordionItem(acc, idx)
-            this.items.push(item)
+            const node = template.content.firstElementChild.cloneNode(true)
+
+            const titleEl = node.querySelector('.accordion-title')
+            const button = node.querySelector('.accordion-toggle')
+            const content = node.querySelector('.accordion-content')
+            const detailsTitle = node.querySelector('.accordion-details-title')
+            const list = node.querySelector('.accordion-list')
+            const header = node.querySelector('.accordion-header')
+
+            if (titleEl) {
+                titleEl.textContent = acc.title
+            }
+            if (button) {
+                button.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
+            }
+            if (detailsTitle) {
+                detailsTitle.textContent = acc.detailsTitle
+            }
+            if (list) {
+                acc.items.forEach((itemText) => {
+                    const li = document.createElement('li')
+                    li.textContent = itemText
+                    list.appendChild(li)
+                })
+            }
+
+            if (header && button && content) {
+                header.addEventListener('click', () => this.toggleAccordion(idx, button, content))
+            }
+
+            wrapper.appendChild(node)
+            this.items.push({ element: node, button, content })
         })
-    }
-
-    createAccordionItem(acc, index) {
-        const col = document.createElement('div')
-        col.className = 'space-y-2'
-
-        // Header
-        const header = document.createElement('div')
-        header.className = 'flex justify-between items-center bg-white dark:bg-gray-700 rounded-lg px-6 py-4 cursor-pointer'
-
-        const title = document.createElement('h3')
-        title.className = 'font-bold text-lg text-black dark:text-white'
-        title.textContent = acc.title
-
-        const button = document.createElement('button')
-        button.className = 'w-5 h-5 flex items-center justify-center rounded-full text-white text-2xl font-bold'
-        button.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
-        button.textContent = '+'
-
-        // Content
-        const content = document.createElement('div')
-        content.className = 'accordion-content bg-gray-50 dark:bg-gray-700 rounded-lg px-6 py-4 overflow-hidden'
-        content.style.maxHeight = '0px'
-        content.style.transition = 'max-height 300ms ease'
-        content.style.display = 'none'
-
-        const detailsTitle = document.createElement('h4')
-        detailsTitle.className = 'font-semibold mb-2 text-black dark:text-white'
-        detailsTitle.textContent = acc.detailsTitle
-
-        const list = document.createElement('ul')
-        list.className = 'list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1'
-
-        acc.items.forEach((itemText) => {
-            const li = document.createElement('li')
-            li.textContent = itemText
-            list.appendChild(li)
-        })
-
-        content.appendChild(detailsTitle)
-        content.appendChild(list)
-
-        header.appendChild(title)
-        header.appendChild(button)
-        col.appendChild(header)
-        col.appendChild(content)
-
-        // Event listener
-        header.addEventListener('click', () => this.toggleAccordion(index, button, content))
-
-        return { element: col, button, content }
     }
 
     toggleAccordion(index, button, content) {
         const isOpen = this.openIndex === index
 
-        // Close all
         this.items.forEach((item, i) => {
-            if (i !== index && item.content.style.display !== 'none') {
+            if (i !== index && item.content && item.content.style.display !== 'none') {
                 this.closeContent(item.content)
-                item.button.textContent = '+'
+                if (item.button) item.button.textContent = '+'
             }
         })
 
-        // Toggle current
         if (isOpen) {
             this.closeContent(content)
             button.textContent = '+'
@@ -551,52 +500,43 @@ class AccordionGroup {
     }
 }
 
-// ========== STATS SECTION ==========
-function createStatsSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'py-16 px-4'
+// ========== STATS INITIALIZER + COUNTER ==========
 
-    const wrapper = document.createElement('div')
-    wrapper.className = 'max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-10'
+function initStatsSection(container, darkMode) {
+    const section = container.querySelector('.stats-section')
+    if (!section) return
+
+    const wrapper = section.querySelector('.stats-wrapper')
+    const template = section.querySelector('#stat-card-template')
+    if (!wrapper || !template) return
 
     const counterElements = []
 
     CONFIG.stats.forEach((stat) => {
-        const { element, counterEl } = createStatCard(stat, darkMode)
-        wrapper.appendChild(element)
-        counterElements.push({ el: counterEl, target: stat.value, suffix: stat.suffix })
+        const node = template.content.firstElementChild.cloneNode(true)
+
+        const valueEl = node.querySelector('.stat-value')
+        const textEl = node.querySelector('.stat-text')
+
+        if (valueEl) {
+            valueEl.style.color = darkMode ? '#3B6CB8' : '#1C238D'
+            valueEl.textContent = `0${stat.suffix}`
+        }
+        if (textEl) {
+            textEl.textContent = stat.text
+        }
+
+        wrapper.appendChild(node)
+        if (valueEl) {
+            counterElements.push({ el: valueEl, target: stat.value, suffix: stat.suffix })
+        }
     })
 
-    section.appendChild(wrapper)
-
-    // Animate counters on scroll
-    const counter = new Counter(counterElements)
+    const counter = new HtmlCounter(counterElements)
     counter.observeSection(section)
-
-    return section
 }
 
-function createStatCard(stat, darkMode) {
-    const card = document.createElement('div')
-    card.className = 'text-center'
-
-    const value = document.createElement('h2')
-    value.className = 'text-5xl font-bold'
-    value.style.color = darkMode ? '#3B6CB8' : '#1C238D'
-    value.textContent = '0' + stat.suffix
-
-    const text = document.createElement('p')
-    text.className = 'text-black dark:text-white mt-4 text-sm'
-    text.textContent = stat.text
-
-    card.appendChild(value)
-    card.appendChild(text)
-
-    return { element: card, counterEl: value }
-}
-
-// Counter Class
-class Counter {
+class HtmlCounter {
     constructor(elements) {
         this.elements = elements
         this.counters = elements.map(() => 0)
@@ -643,138 +583,101 @@ class Counter {
     }
 }
 
-// ========== FORM SECTION ==========
-function createFormSection(darkMode) {
-    const section = document.createElement('section')
-    section.className = 'bg-[#F6F3EE] dark:bg-gray-800 py-16 px-4 text-center'
+// ========== FORM INITIALIZER + CLASS ==========
 
-    const title = document.createElement('h2')
-    title.className = 'text-3xl font-bold mb-4 text-black dark:text-white'
-    title.textContent = CONFIG.form.title
+function initFormSection(container, darkMode) {
+    const section = container.querySelector('.form-section')
+    if (!section) return
 
-    const description = document.createElement('p')
-    description.className = 'text-black dark:text-white mb-8 text-sm'
-    description.textContent = CONFIG.form.description
+    const title = section.querySelector('.form-title')
+    const description = section.querySelector('.form-description')
 
-    const form = new ContactForm(darkMode)
+    if (title) {
+        title.textContent = CONFIG.form.title
+    }
+    if (description) {
+        description.textContent = CONFIG.form.description
+    }
 
-    section.appendChild(title)
-    section.appendChild(description)
-    section.appendChild(form.element)
-
-    return section
+    new HtmlContactForm(section, darkMode)
 }
 
-// Form Class
-class ContactForm {
-    constructor(darkMode) {
+class HtmlContactForm {
+    constructor(section, darkMode) {
         this.darkMode = darkMode
-        this.createElement()
-    }
+        this.section = section
+        this.element = section.querySelector('.contact-form')
+        if (!this.element) return
 
-    createElement() {
-        try {
-            this.element = document.createElement('form')
-            this.element.noValidate = true
-            this.element.className = 'max-w-lg mx-auto flex flex-col gap-1'
+        this.element.noValidate = true
 
-            // Fields
-            this.emailInput = this.createInput(CONFIG.form.fields.email)
-            this.emailError = this.createErrorDiv()
-            this.nameInput = this.createInput(CONFIG.form.fields.name)
-            this.nameError = this.createErrorDiv()
-            this.phoneInput = this.createInput(CONFIG.form.fields.phone)
-            this.phoneError = this.createErrorDiv()
-            this.messageInput = this.createTextarea(CONFIG.form.fields.message)
-            this.messageError = this.createErrorDiv()
+        const { email, name, phone, message } = CONFIG.form.fields
 
-            // Submit button
-            this.submitButton = this.createSubmitButton()
+        this.emailInput = this.element.querySelector('[data-field="email"]')
+        this.nameInput = this.element.querySelector('[data-field="name"]')
+        this.phoneInput = this.element.querySelector('[data-field="phone"]')
+        this.messageInput = this.element.querySelector('[data-field="message"]')
 
-            // Append all with their error divs
-            this.element.appendChild(this.emailInput)
-            this.element.appendChild(this.emailError)
-            this.element.appendChild(this.nameInput)
-            this.element.appendChild(this.nameError)
-            this.element.appendChild(this.phoneInput)
-            this.element.appendChild(this.phoneError)
-            this.element.appendChild(this.messageInput)
-            this.element.appendChild(this.messageError)
-            this.element.appendChild(this.submitButton)
+        this.emailError = this.element.querySelector('[data-error="email"]')
+        this.nameError = this.element.querySelector('[data-error="name"]')
+        this.phoneError = this.element.querySelector('[data-error="phone"]')
+        this.messageError = this.element.querySelector('[data-error="message"]')
 
-            // Event listener
-            this.element.addEventListener('submit', (e) => this.handleSubmit(e))
-        } catch (err) {
-            console.error('Error creating form:', err)
+        if (this.emailInput && email) this.applyInputConfig(this.emailInput, email)
+        if (this.nameInput && name) this.applyInputConfig(this.nameInput, name)
+        if (this.phoneInput && phone) this.applyInputConfig(this.phoneInput, phone)
+        if (this.messageInput && message) this.applyTextareaConfig(this.messageInput, message)
+
+        this.submitButton = this.element.querySelector('.form-submit')
+        if (this.submitButton) {
+            this.submitButton.textContent = CONFIG.form.submitText
+            this.submitButton.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
+
+            this.submitButton.addEventListener('mouseenter', () => {
+                this.submitButton.style.backgroundColor = this.darkMode ? '#3D44B8' : '#141B6B'
+            })
+            this.submitButton.addEventListener('mouseleave', () => {
+                this.submitButton.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
+            })
         }
+
+        this.element.addEventListener('submit', (e) => this.handleSubmit(e))
     }
 
-    createInput({ name, type, placeholder }) {
-        const input = document.createElement('input')
+    applyInputConfig(input, { name, type, placeholder }) {
         input.name = name
         input.type = type
-        input.placeholder = placeholder
-        input.className = 'px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white'
+        if (placeholder) input.placeholder = placeholder
         input.style.setProperty('--tw-ring-color', '#1C238D')
-        return input
     }
 
-    createTextarea({ name, placeholder, rows }) {
-        const textarea = document.createElement('textarea')
+    applyTextareaConfig(textarea, { name, placeholder, rows }) {
         textarea.name = name
-        textarea.placeholder = placeholder
-        textarea.rows = rows
-        textarea.className = 'px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 resize-none bg-white dark:bg-gray-700 text-black dark:text-white'
+        if (placeholder) textarea.placeholder = placeholder
+        if (rows != null) textarea.rows = rows
         textarea.style.setProperty('--tw-ring-color', '#1C238D')
-        return textarea
-    }
-
-    createErrorDiv() {
-        const div = document.createElement('div')
-        div.className = 'text-red-600 text-sm mt-1 min-h-[1rem]'
-        return div
-    }
-
-    createSubmitButton() {
-        const button = document.createElement('button')
-        button.type = 'submit'
-        button.className = 'text-white font-bold py-3 px-6 rounded-md mx-auto transition'
-        button.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
-        button.textContent = CONFIG.form.submitText
-
-        button.addEventListener('mouseenter', () => {
-            button.style.backgroundColor = this.darkMode ? '#3D44B8' : '#141B6B'
-        })
-        button.addEventListener('mouseleave', () => {
-            button.style.backgroundColor = this.darkMode ? '#2E3694' : '#1C238D'
-        })
-
-        return button
     }
 
     handleSubmit(e) {
         e.preventDefault()
         try {
-            const email = this.emailInput.value.trim()
-            const name = this.nameInput.value.trim()
-            const phone = this.phoneInput.value.trim()
-            const message = this.messageInput.value.trim()
+            const email = this.emailInput ? this.emailInput.value.trim() : ''
+            const name = this.nameInput ? this.nameInput.value.trim() : ''
+            const phone = this.phoneInput ? this.phoneInput.value.trim() : ''
+            const message = this.messageInput ? this.messageInput.value.trim() : ''
 
             const errors = this.validate(email, name, phone, message)
 
-            // Clear all error divs
-            this.emailError.textContent = ''
-            this.nameError.textContent = ''
-            this.phoneError.textContent = ''
-            this.messageError.textContent = ''
+            if (this.emailError) this.emailError.textContent = ''
+            if (this.nameError) this.nameError.textContent = ''
+            if (this.phoneError) this.phoneError.textContent = ''
+            if (this.messageError) this.messageError.textContent = ''
 
-            // Display errors beside each field
-            if (errors.email) this.emailError.textContent = errors.email
-            if (errors.name) this.nameError.textContent = errors.name
-            if (errors.phone) this.phoneError.textContent = errors.phone
-            if (errors.message) this.messageError.textContent = errors.message
+            if (errors.email && this.emailError) this.emailError.textContent = errors.email
+            if (errors.name && this.nameError) this.nameError.textContent = errors.name
+            if (errors.phone && this.phoneError) this.phoneError.textContent = errors.phone
+            if (errors.message && this.messageError) this.messageError.textContent = errors.message
 
-            // If no errors, submit
             if (Object.keys(errors).length === 0) {
                 alert('Form is valid!')
                 this.element.reset()
@@ -788,15 +691,13 @@ class ContactForm {
     validate(email, name, phone, message) {
         const errors = {}
 
-        // Email regex
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!email) {
             errors.email = 'Email is required'
         } else if (!emailRegex.test(email)) {
             errors.email = 'Invalid email address'
         }
 
-        // Name regex
         const nameRegex = /^[A-Za-z\s]{2,}$/
         if (!name) {
             errors.name = 'Name is required'
@@ -804,7 +705,6 @@ class ContactForm {
             errors.name = 'Invalid name (only letters, min 2 chars)'
         }
 
-        // Phone regex
         const phoneRegex = /^\d{10,15}$/
         const phoneDigits = phone.replace(/\D/g, '')
         if (!phone) {
@@ -813,33 +713,10 @@ class ContactForm {
             errors.phone = 'Invalid phone number'
         }
 
-        // Message
         if (!message) {
             errors.message = 'Message is required'
         }
 
         return errors
     }
-}
-
-
-// ========== HELPER FUNCTIONS ==========
-function createPicture(srcPath, alt = '') {
-    const picture = document.createElement('picture')
-
-    const source = document.createElement('source')
-    source.type = 'image/webp'
-    source.srcset = `${srcPath} 1x`
-
-    const img = document.createElement('img')
-    img.src = srcPath
-    img.alt = alt
-    img.width = 40
-    img.height = 40
-    img.loading = 'lazy'
-
-    picture.appendChild(source)
-    picture.appendChild(img)
-
-    return { picture, img }
 }

@@ -1,19 +1,117 @@
 <div class="careers-container">
     <!-- Hero Section -->
-    <section class="hero-section"></section>
+    <section class="hero-section text-white text-center py-10 px-4 sm:px-10 lg:px-40">
+        <h1 class="hero-title text-4xl font-bold mb-6"></h1>
+        <p class="hero-description text-lg mb-8"></p>
+    </section>
 
     <!-- Features Section -->
-    <section class="features-section"></section>
+    <section class="features-section py-16 px-4 bg-[#F6F3EE] dark:bg-gray-800">
+        <p class="features-lead text-center text-black dark:text-white mb-2"></p>
+        <h2 class="features-title text-center font-bold text-3xl mb-12"></h2>
+
+        <div class="features-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+        <template id="feature-card-template">
+            <a href="#"
+                class="feature-card flex flex-col items-center text-center gap-3 p-4 rounded-lg hover:bg-gray-100 hover:scale-105 transition cursor-pointer">
+                <picture class="feature-picture">
+                    <source type="image/webp" class="feature-picture-source" />
+                    <img class="feature-image w-20 h-20 object-cover" width="80" height="80" loading="lazy" alt="" />
+                </picture>
+                <h3 class="feature-title font-bold"></h3>
+                <p class="feature-description text-sm text-gray-700 dark:text-gray-300"></p>
+            </a>
+        </template>
+    </section>
 
     <!-- Slider Section -->
-    <section class="slider-section"></section>
+    <section class="slider-section py-16 px-4 bg-gray-50 dark:bg-gray-900 text-center">
+        <div class="slider-wrap max-w-4xl mx-auto relative flex items-center gap-4" tabindex="0" role="region"
+            aria-label="Carousel">
+            <button
+                class="slider-prev flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white transition hover:opacity-80"></button>
+
+            <div class="slider-viewport flex-1 overflow-hidden rounded-xl">
+                <div class="slider-track"></div>
+            </div>
+
+            <button
+                class="slider-next flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white transition hover:opacity-80"></button>
+        </div>
+
+        <div class="slider-indicators flex justify-center gap-3 mt-6"></div>
+
+        <template id="slider-slide-template">
+            <div class="slider-slide p-8">
+                <h3 class="slider-slide-title text-2xl font-bold mb-4"></h3>
+                <p class="slider-slide-paragraph text-gray-700 dark:text-gray-300 text-sm leading-6 mb-3"></p>
+            </div>
+        </template>
+    </section>
 
     <!-- Accordions Section -->
-    <section class="accordions-section"></section>
+    <section class="accordions-section py-16 px-4 bg-[#F6F3EE] dark:bg-gray-800">
+        <div class="accordions-wrapper max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+
+        <template id="accordion-item-template">
+            <div class="accordion-item space-y-2">
+                <div
+                    class="accordion-header flex justify-between items-center bg-white dark:bg-gray-700 rounded-lg px-6 py-4 cursor-pointer">
+                    <h3 class="accordion-title font-bold text-lg text-black dark:text-white"></h3>
+                    <button
+                        class="accordion-toggle w-5 h-5 flex items-center justify-center rounded-full text-white text-2xl font-bold">+</button>
+                </div>
+                <div class="accordion-content bg-gray-50 dark:bg-gray-700 rounded-lg px-6 py-4 overflow-hidden"
+                    style="max-height:0;display:none;">
+                    <h4 class="accordion-details-title font-semibold mb-2 text-black dark:text-white"></h4>
+                    <ul class="accordion-list list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    </ul>
+                </div>
+            </div>
+        </template>
+    </section>
 
     <!-- Stats Section -->
-    <section class="stats-section"></section>
+    <section class="stats-section py-16 px-4">
+        <div class="stats-wrapper max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-10"></div>
+
+        <template id="stat-card-template">
+            <div class="stat-card text-center">
+                <h2 class="stat-value text-5xl font-bold"></h2>
+                <p class="stat-text text-black dark:text-white mt-4 text-sm"></p>
+            </div>
+        </template>
+    </section>
 
     <!-- Form Section -->
-    <section class="form-section"></section>
+    <section class="form-section bg-[#F6F3EE] dark:bg-gray-800 py-16 px-4 text-center">
+        <h2 class="form-title text-3xl font-bold mb-4 text-black dark:text-white"></h2>
+        <p class="form-description text-black dark:text-white mb-8 text-sm"></p>
+
+        <form class="contact-form max-w-lg mx-auto flex flex-col gap-1" novalidate>
+            <input
+                class="form-input-email px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white"
+                data-field="email" />
+            <div class="form-error-email text-red-600 text-sm mt-1 min-h-[1rem]" data-error="email"></div>
+
+            <input
+                class="form-input-name px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white"
+                data-field="name" />
+            <div class="form-error-name text-red-600 text-sm mt-1 min-h-[1rem]" data-error="name"></div>
+
+            <input
+                class="form-input-phone px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 bg-white dark:bg-gray-700 text-black dark:text-white"
+                data-field="phone" />
+            <div class="form-error-phone text-red-600 text-sm mt-1 min-h-[1rem]" data-error="phone"></div>
+
+            <textarea
+                class="form-input-message px-4 py-3 rounded-md border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 resize-none bg-white dark:bg-gray-700 text-black dark:text-white"
+                data-field="message"></textarea>
+            <div class="form-error-message text-red-600 text-sm mt-1 min-h-[1rem]" data-error="message"></div>
+
+            <button type="submit"
+                class="form-submit text-white font-bold py-3 px-6 rounded-md mx-auto transition"></button>
+        </form>
+    </section>
 </div>
