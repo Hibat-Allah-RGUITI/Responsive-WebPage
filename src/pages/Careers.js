@@ -451,6 +451,14 @@ class HtmlAccordionGroup {
                 })
             }
 
+            // Ensure closed state is fully hidden (no text peeking)
+            if (content) {
+                content.style.maxHeight = '0px'
+                content.style.display = 'none'
+                content.style.overflow = 'hidden'
+                content.style.transition = 'max-height 300ms ease'
+            }
+
             if (header && button && content) {
                 header.addEventListener('click', () => this.toggleAccordion(idx, button, content))
             }
